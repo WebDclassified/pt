@@ -1,0 +1,24 @@
+# Master Build Checklist
+
+- [ ] Read all phases
+- [ ] Content locked
+- [ ] Vizquo verified at build time
+- [ ] Creative brief locked
+- [ ] Storyboard locked
+- [ ] 3D world prototype
+- [ ] Camera/timeline prototype
+- [ ] Microinteraction system
+- [ ] Audio system
+- [ ] Accessible DOM layer
+- [ ] Project case studies
+- [ ] Asset optimization
+- [ ] Performance budget
+- [ ] SEO/security/privacy
+- [ ] Production architecture
+- [ ] Per-phase validation reports
+- [ ] Full QA matrix
+- [ ] Production smoke test
+- [ ] Credits/attribution audit
+- [ ] Final recruiter test
+- [ ] Final engineer test
+- [ ] Final visual-frame test

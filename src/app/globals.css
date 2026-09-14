@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ============================================================
+   BUILD / BREAK / REBUILD — design tokens (Phase 05)
+   Starting tokens per docs/05_ART_DIRECTION.md; final values
+   tuned against contrast and cinematic grading.
+   ============================================================ */
+
+@theme {
+  /* Environment palette — near-black graphite world */
+  --color-void: #050607;
+  --color-graphite: #0b0e10;
+  --color-surface: #111518;
+  --color-warm-white: #f1efe8;
+  --color-secondary-gray: #969b9f;
+  --color-signal: #c8ff3d;
+
+  /* Type roles — display / body / technical (Phase 05).
+     Local fallbacks keep a sane family if a next/font variable is missing. */
+  --font-sans: var(--font-geist-sans, "Geist"), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, "SF Mono", monospace;
+  --font-display: var(--font-space-grotesk, "Space Grotesk"), var(--font-geist-sans, "Geist"), ui-sans-serif, sans-serif;
+
+  /* Spacing scale (Phase 05) */
+  --spacing-1: 0.25rem; /* 4 */
+  --spacing-2: 0.5rem; /* 8 */
+  --spacing-3: 0.75rem; /* 12 */
+  --spacing-4: 1rem; /* 16 */
+  --spacing-6: 1.5rem; /* 24 */
+  --spacing-8: 2rem; /* 32 */
+  --spacing-12: 3rem; /* 48 */
+  --spacing-16: 4rem; /* 64 */
+  --spacing-24: 6rem; /* 96 */
+  --spacing-32: 8rem; /* 128 */
+  --spacing-40: 10rem; /* 160 */
+
+  /* Grid */
+  --grid-columns: 12;
+}
+
+:root {
+  color-scheme: dark;
+  /* Motion tokens (Phase 08) — shared with src/lib/motion.ts values */
+  --motion-micro: 180ms;
+  --motion-component: 450ms;
+  --ease-out-cine: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  background-color: var(--color-void);
+  color: var(--color-warm-white);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-void);
+  color: var(--color-warm-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus — WCAG 2.2 (Phase 10) */
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Phase 08 — global interaction states (rest/hover/focus/pressed)
+   One physical grammar: elements respond with small translations,
+   signal accents, and growing connection lines — never cursor toys.
+   ============================================================ */
+
+.pressable {
+  transition:
+    transform var(--motion-micro) var(--ease-out-cine),
+    background-color var(--motion-micro) var(--ease-out-cine),
+    border-color var(--motion-micro) var(--ease-out-cine),
+    color var(--motion-micro) var(--ease-out-cine);
+}
+.pressable:active {
+  transform: scale(0.98);
+}
+
+/* CONNECT grammar: a signal line grows from rest to full connection */
+.signal-line {
+  height: 1px;
+  width: 2rem;
+  background: var(--color-signal);
+  opacity: 0.45;
+  transition:
+    width var(--motion-component) var(--ease-out-cine),
+    opacity var(--motion-component) var(--ease-out-cine);
+}
+.group:hover .signal-line,
+.group:focus-within .signal-line {
+  width: 5rem;
+  opacity: 1;
+}
+
+/* ACTIVATE grammar: titles shift slightly toward the reader */
+.activate-shift {
+  transition: transform var(--motion-component) var(--ease-out-cine);
+}
+.group:hover .activate-shift {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable,
+  .signal-line,
+  .activate-shift {
+    transition: none;
+  }
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-void);
+}
+
+/* Signal accent — indicates active/important states only (Phase 02) */
+.text-signal {
+  color: var(--color-signal);
+}
+
+/* Technical metadata (Phase 05 type roles) */
+.font-tech {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-secondary-gray);
+}
+
+/* Type hierarchy (Phase 05) — fluid clamp scale, display face on chapter+
+   levels only. Body copy stays in the neutral sans at readable sizes. */
+.type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 5.5vw + 1rem, 6.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+.type-chapter {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 2.6vw + 0.8rem, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+}
+
+.type-project {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.2vw + 1rem, 2rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+}

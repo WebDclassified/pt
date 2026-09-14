@@ -1,0 +1,37 @@
+{
+  "name": "prabhat-teotia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BUILD / BREAK / REBUILD — cinematic portfolio of Prabhat Teotia",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "validate": "npm run typecheck && npm run lint && node scripts/check-contrast.mjs && node scripts/check-secrets.mjs && npm run build && npm run test:e2e && node scripts/perf-audit.mjs",
+    "validate:fast": "npm run typecheck && npm run lint && node scripts/check-contrast.mjs && node scripts/check-secrets.mjs"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.3.0",
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.11",
+    "next": "^15.5.0",
+    "react": "~19.2.0",
+    "react-dom": "~19.2.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.180.0",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "^15.5.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.2"
+  }
+}
