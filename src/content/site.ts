@@ -5,7 +5,13 @@
  */
 export const site = {
   name: "Prabhat Teotia",
+  nameDisplay: "Prabhat\nTeotia",
   role: "Software Developer / Full-Stack Developer",
+  /** Hero identity line — role only, no slash, no stack list (§hero) */
+  heroRole: "Software Developer",
+  /** Hero proof line — what I do, said the way a builder would say it */
+  heroStatement:
+    "I take products from a blank repo to production — the idea, the schema, the release, and the fixes after. Vizquo, a design-system inspector used by real designers, is one of them.",
   // TODO(Phase 14): replace with real production domain before launch
   url: "https://prabhatteotia.dev",
   description:

@@ -133,6 +133,33 @@ const _pos = new THREE.Vector3();
 const _tgt = new THREE.Vector3();
 const _a = new THREE.Vector3();
 const _b = new THREE.Vector3();
+const _next = { position: new THREE.Vector3(), target: new THREE.Vector3() };
+
+/** Film order — the cut each scene hands off to. */
+const FILM_ORDER: SceneState[] = [
+  "BOOT",
+  "INTRO",
+  "ORIGIN",
+  "IDENTITY",
+  "SYSTEM",
+  "EXPERIENCE",
+  "PROJECT_VIZQUO",
+  "PROJECT_QUPAY",
+  "FAILURE",
+  "REBUILD",
+  "PROJECT_HILO",
+  "PROJECT_MEDIUM",
+  "PROJECT_BLOCK_SWAP",
+  "SYSTEMS",
+  "LAB",
+  "ABOUT",
+  "NOW",
+  "CONTACT",
+  "FINALE",
+];
+
+const NEXT_SCENE: Partial<Record<SceneState, SceneState>> =
+  Object.fromEntries(FILM_ORDER.slice(0, -1).map((s, i) => [s, FILM_ORDER[i + 1]]));
 
 export function evaluateCamera(
   state: SceneState,
@@ -151,6 +178,45 @@ export function evaluateCamera(
   out.target.copy(_a.lerp(_b, t));
   _pos.copy(out.position);
   _tgt.copy(out.target);
+}
+
+/**
+ * Cinematic continuity (user direction: "continuous flow, no breaks between
+ * sections"). The authored paths above are shot-local — each scene's path
+ * ends where it ends, and the next scene begins elsewhere, so raw evaluation
+ * teleports at every boundary (the exponential smoothing then turns each
+ * teleport into a whoosh: the "break" the user saw).
+ *
+ * Fix: boundary blending. During the last BOUNDARY_TAIL of a scene, the
+ * evaluated pose crossfades into the NEXT scene's pose evaluated from its
+ * own beginning, mirrored so position and velocity match continuously at
+ * the cut. Result: glide → settle → glide, one unbroken dolly move across
+ * the whole film.
+ */
+const BOUNDARY_TAIL = 0.18;
+
+export function evaluateCameraContinuous(
+  state: SceneState,
+  local: number,
+  out: { position: THREE.Vector3; target: THREE.Vector3 },
+): void {
+  const next = NEXT_SCENE[state];
+  if (!next) {
+    evaluateCamera(state, local, out);
+    return;
+  }
+  evaluateCamera(state, local, out);
+  if (local <= 1 - BOUNDARY_TAIL) return;
+
+  // Mirror progress: how far into the tail we are (0→1)
+  const tail = (local - (1 - BOUNDARY_TAIL)) / BOUNDARY_TAIL;
+  const ease = tail * tail * (3 - 2 * tail);
+  // Next scene's pose at its mirrored start progress — the pose its own
+  // path will pass through just after the boundary
+  const nextLocal = tail * 0.22;
+  evaluateCamera(next, nextLocal, _next);
+  out.position.lerp(_next.position, ease);
+  out.target.lerp(_next.target, ease);
 }
 
 /** Subtle idle drift — breathing motion that never overrides the path */

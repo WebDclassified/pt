@@ -13,6 +13,10 @@ const eslintConfig = [
       "test-results/**",
       "next-env.d.ts",
       "evidence/**",
+      // Vendored third-party runtime code (self-hosted Spline runtime +
+      // draco wasm libs) — never lint vendor distributions
+      "public/spline/**",
+      "public/libs/**",
     ],
   },
 ];

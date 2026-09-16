@@ -30,16 +30,16 @@ function ProjectCard({
   verified: boolean;
 }) {
   return (
-    <article className="group relative border border-white/10 bg-surface/60 p-6 transition-colors duration-300 hover:border-signal/40 sm:p-8">
+    <article className="u-motion-soft group relative border border-white/10 bg-surface/60 p-6 hover:-translate-y-1 hover:border-signal/40 hover:shadow-[0_18px_50px_-20px_rgba(0,0,0,0.8)] sm:p-8">
       <div className="flex items-baseline justify-between gap-4">
         <span className="font-tech text-signal">{number}</span>
-        <span className="font-tech">
+        <span className="font-tech text-secondary-gray">
           {role} · {year}
           {verified ? " · VERIFIED" : ""}
         </span>
       </div>
-      <h3 className="type-project activate-shift mt-4 text-warm-white">
-        <Link href={`/${slug}`} className="hover:text-signal">
+      <h3 className="type-project activate-shift mt-4 horizon-fill">
+        <Link href={`/${slug}`} className="hover:opacity-80">
           {title}
         </Link>
       </h3>
@@ -55,14 +55,17 @@ function ProjectCard({
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-        <Link href={`/${slug}`} className="font-tech text-warm-white hover:text-signal">
+        <Link
+          href={`/${slug}`}
+          className="u-line-link font-tech text-warm-white hover:text-signal"
+        >
           CASE STUDY →
         </Link>
         {demo ? (
           <a
             href={demo}
             rel="noopener"
-            className="font-tech text-warm-white hover:text-signal"
+            className="u-line-link font-tech text-warm-white hover:text-signal"
           >
             LIVE DEMO ↗
           </a>
@@ -70,7 +73,7 @@ function ProjectCard({
         <a
           href={repository}
           rel="noopener"
-          className="font-tech text-warm-white hover:text-signal"
+          className="u-line-link font-tech text-warm-white hover:text-signal"
         >
           GITHUB ↗
         </a>
@@ -90,10 +93,11 @@ function SectionHeading({
 }) {
   return (
     <Reveal className="max-w-3xl">
-      <p className="font-tech text-signal">{kicker}</p>
+      <div className="horizon-line w-24" aria-hidden="true" />
+      <p className="mt-5 font-tech text-signal">{kicker}</p>
       <h2
         id={id}
-        className="type-chapter mt-3 text-warm-white"
+        className="type-chapter mt-3 horizon-fill"
       >
         {title}
       </h2>
@@ -112,34 +116,35 @@ export default function Home() {
         {/* 00 — PROLOGUE / IDENTITY */}
         <section
           aria-labelledby="hero-heading"
-          className="mx-auto flex min-h-svh max-w-7xl flex-col justify-center px-4 pt-14 sm:px-6"
+          className="u-anchor-scroll mx-auto flex min-h-svh max-w-7xl flex-col justify-center px-4 pt-14 sm:px-6"
         >
-          <p className="font-tech text-signal">BUILD / BREAK / REBUILD</p>
+          <p className="hero-enter font-tech text-signal">BUILD / BREAK / REBUILD</p>
+          {/* The idea is the hero — aligned to the proof of work: systems
+              built end to end. The name lives in the header and the footer
+              signature; the work speaks here. */}
           <h1
             id="hero-heading"
-            className="type-hero mt-6 max-w-4xl text-warm-white"
+            className="type-hero hero-enter hero-enter-2 mt-6 max-w-4xl horizon-fill"
           >
             Everything begins with an idea.
-            <span className="block text-secondary-gray">
+            <span className="block horizon-fill-dim">
               Then it becomes a system.
             </span>
           </h1>
-          <Reveal>
+          <Reveal delay={0.15}>
             <p className="mt-8 max-w-2xl text-base leading-relaxed text-secondary-gray sm:text-lg">
-              {site.name} — {site.role}. I build scalable web applications with
-              React, Node.js, TypeScript, and modern backend architectures — and
-              I built Vizquo, the local-first web design system inspector.
+              {site.heroStatement}
             </p>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
               <Link
                 href="#work"
-                className="border border-signal px-5 py-3 font-tech text-signal transition-colors hover:bg-signal hover:text-void"
+                className="u-motion-soft cta-glow border border-signal px-5 py-3 font-tech text-signal transition-colors hover:bg-signal hover:text-void"
               >
                 VIEW THE WORK
               </Link>
               <Link
                 href="#contact"
-                className="border border-white/20 px-5 py-3 font-tech text-warm-white transition-colors hover:border-signal hover:text-signal"
+                className="u-motion-soft border border-white/20 px-5 py-3 font-tech text-warm-white transition-colors hover:border-signal hover:text-signal"
               >
                 GET IN TOUCH
               </Link>
@@ -156,23 +161,24 @@ export default function Home() {
           <SectionHeading
             id="work-heading"
             kicker="SELECTED WORK — VERIFIED ONLY"
-            title="Six systems, built end to end."
+            title="Systems built end to end."
           />
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                number={project.number}
-                title={project.title}
-                summary={project.summary}
-                stack={project.stack}
-                role={project.role}
-                year={project.year}
-                slug={project.slug}
-                repository={project.repository}
-                demo={project.demo}
-                verified={project.verified}
-              />
+            {projects.map((project, index) => (
+              <Reveal key={project.id} delay={(index % 2) * 0.08} once={false}>
+                <ProjectCard
+                  number={project.number}
+                  title={project.title}
+                  summary={project.summary}
+                  stack={project.stack}
+                  role={project.role}
+                  year={project.year}
+                  slug={project.slug}
+                  repository={project.repository}
+                  demo={project.demo}
+                  verified={project.verified}
+                />
+              </Reveal>
             ))}
           </div>
         </section>
@@ -236,7 +242,7 @@ export default function Home() {
           <SectionHeading
             id="systems-heading"
             kicker="SYSTEMS — HOW I ENGINEER"
-            title="Frontend, backend, data — one discipline."
+            title="Every layer, one owner."
           />
           <ul className="mt-12 flex flex-wrap gap-3">
             {skills.map((skill) => (
@@ -248,13 +254,9 @@ export default function Home() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 max-w-2xl text-sm text-secondary-gray">
-            Secure APIs with JWT-based authentication, relational and document
-            data modeling, and accessible, responsive interfaces.
-          </p>
         </section>
 
-        {/* 12 — LAB */}
+        {/* 12 — LAB (staged: /lab carries live experiments) */}
         <section
           id="lab"
           aria-labelledby="lab-heading"
@@ -262,14 +264,20 @@ export default function Home() {
         >
           <SectionHeading
             id="lab-heading"
-            kicker="LAB — EXPERIMENTS"
-            title="Nothing staged. Nothing yet."
+            kicker="LAB — EXPERIMENTS THAT RUN"
+            title="Built to be played with."
           />
           <p className="mt-8 max-w-2xl text-sm leading-relaxed text-secondary-gray">
-            Experimental creative-technology work (shaders, WebGPU/TSL, data
-            visualization) lands here once it is real and runnable — never as
-            placeholders.
+            Live GPU experiments from the same engine that drives this site —
+            seeded particle fields, procedural graphics, playable prototypes.
+            Each one runs in your browser before it is advertised.
           </p>
+          <Link
+            href="/lab"
+            className="u-motion-soft cta-glow mt-8 inline-block border border-signal px-5 py-3 font-tech text-signal transition-colors hover:bg-signal hover:text-void"
+          >
+            ENTER THE LAB
+          </Link>
         </section>
 
         {/* 13/14 — ABOUT / NOW */}
@@ -312,7 +320,7 @@ export default function Home() {
             <div className="mt-12 flex flex-wrap gap-x-8 gap-y-4">
             <a
               href={`mailto:${site.email}`}
-              className="border border-signal px-5 py-3 font-tech text-signal transition-colors hover:bg-signal hover:text-void"
+              className="u-motion-soft cta-glow border border-signal px-5 py-3 font-tech text-signal transition-colors hover:bg-signal hover:text-void"
             >
               EMAIL ME
             </a>

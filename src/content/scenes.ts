@@ -408,8 +408,8 @@ export const scenes: SceneConfig[] = [
     },
     domBeats: {
       heading: "The lab.",
-      body: ["Experiments land here when they're real. Nothing staged."],
-      metadata: ["GLSL", "WEBGPU/TSL", "SHADERS", "WIP"],
+      body: ["Live experiments, playable in your browser.", "Nothing staged."],
+      metadata: ["GPU PARTICLES", "CELLULAR SYSTEMS", "PLAYABLE", "/LAB"],
     },
     threeDTreatment: "Rotating shader experiment; WebGPU/TSL behind a capability flag",
     transitionIn: "shader-dissolve",

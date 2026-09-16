@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /**
  * Phase 21 — interactive cinematic upgrade validation.
- * Proves: wayfinding indicator tracks the film (§97), Skip Intro escapes the
+ * Proves: wayfinding indicator tracks the film (§97), engine introspection
  * prologue (§95), the engine publishes its scene state for wayfinding and
  * deterministic capture (§123), and interactions leave content intact.
  */
@@ -40,18 +40,8 @@ test.describe("Phase 21 — wayfinding (§97)", () => {
   });
 });
 
-test.describe("Phase 21 — skip intro (§95)", () => {
-  test("escape hatch appears in the prologue and jumps to the work", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const skip = page.getByRole("link", { name: "SKIP INTRO →" });
-    await expect(skip).toBeVisible();
-    await skip.click();
-    // Bypassed the spectacle — content must be in view
-    await expect(page.getByText("Vizquo").first()).toBeVisible();
-  });
-});
+// Skip Intro (§95) removed by user direction — the film plays without an
+// escape hatch; the nav remains the wayfinding path.
 
 test.describe("Phase 21 — engine introspection (§123)", () => {
   test("scene state is exposed and matches the film registry", async ({

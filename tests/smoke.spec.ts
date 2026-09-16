@@ -9,7 +9,7 @@ test.describe("M0 smoke — content layer", () => {
       "Everything begins with an idea",
     );
     await expect(
-      page.getByRole("link", { name: "PRABHAT TEOTIA" }),
+      page.getByRole("link", { name: /prabhat teotia/i }).first(),
     ).toBeVisible();
     await expect(page.getByText("Vizquo").first()).toBeVisible();
   });

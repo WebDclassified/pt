@@ -7,7 +7,7 @@ import { useMotionPreferences } from "@/components/MotionPreferencesProvider";
 import { getRuntime, type Runtime } from "@/lib/runtime";
 import { getSceneAt } from "@/lib/timeline";
 import { emitSceneChange } from "@/lib/sceneBus";
-import { evaluateCamera, applyIdleDrift, SCENE_ANCHORS } from "@/lib/cameraGrammar";
+import { evaluateCameraContinuous, applyIdleDrift, SCENE_ANCHORS } from "@/lib/cameraGrammar";
 import { SceneManager } from "@/lib/sceneManager";
 import { QualityController, TIERS } from "@/lib/quality";
 import { mulberry32 } from "@/lib/random";
@@ -263,8 +263,9 @@ function World({ runtime, reducedMotion }: { runtime: Runtime; reducedMotion: bo
     manager.sync(cursor.id);
     manager.update(runtime.time, cursor.local);
 
-    // Authored camera grammar + idle drift + capped velocity push (Phase 07)
-    evaluateCamera(cursor.id, cursor.local, {
+    // Authored camera grammar with boundary blending + idle drift + capped
+    // velocity push (Phase 07; cinematic continuity per user direction)
+    evaluateCameraContinuous(cursor.id, cursor.local, {
       position: desiredPos,
       target: desiredTarget,
     });

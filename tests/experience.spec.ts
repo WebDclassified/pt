@@ -35,8 +35,12 @@ test.describe("M2 — cinematic traversal", () => {
       page.getByRole("heading", { name: /Everything begins with an idea/ }),
     ).toBeVisible();
 
-    // The persistent canvas never unmounted
-    const canvasCount = await page.locator("canvas").count();
+    // The persistent canvas never unmounted. (The footer Spline signature
+    // may add its own decorative canvas once scrolled into view — scope to
+    // the film's R3F container.)
+    const canvasCount = await page
+      .locator("main canvas")
+      .count();
     expect(canvasCount).toBe(1);
   });
 
@@ -48,13 +52,13 @@ test.describe("M2 — cinematic traversal", () => {
     await workSection.scrollIntoViewIfNeeded();
     await page.waitForTimeout(900);
     await expect(
-      page.getByRole("heading", { name: /Six systems, built end to end/ }),
+      page.getByRole("heading", { name: /Systems built end to end/ }),
     ).toBeVisible();
     // Beat stays revealed after scrolling past (once:true behavior)
     await page.mouse.wheel(0, 800);
     await page.waitForTimeout(400);
     await expect(
-      page.getByRole("heading", { name: /Six systems, built end to end/ }),
+      page.getByRole("heading", { name: /Systems built end to end/ }),
     ).toBeVisible();
   });
 
@@ -69,7 +73,7 @@ test.describe("M2 — cinematic traversal", () => {
     ).toBeVisible();
     await page.locator("#work").scrollIntoViewIfNeeded();
     await expect(
-      page.getByRole("heading", { name: /Six systems, built end to end/ }),
+      page.getByRole("heading", { name: /Systems built end to end/ }),
     ).toBeVisible();
     // Lenis must not be active — html carries no smoothing artifacts
     const lenisActive = await page.evaluate(

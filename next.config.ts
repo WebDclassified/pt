@@ -11,7 +11,11 @@ import type { NextConfig } from "next";
  *   without a nonce middleware. Upgrade path: nonce-based middleware.
  * - `script-src 'unsafe-eval'` is DEV-ONLY (React refresh runtime).
  * - Fonts are self-hosted via next/font (no external font hosts).
- * - No third-party scripts, frames, or connections exist in the app.
+ * - Third-party embed, by explicit user decision: the Spline footer scene
+ *   (self-hosted runtime, foreign scene host only). Background music is a
+ *   self-hosted MP3 (public/assets) through WebAudio — no foreign origins
+ *   needed for it. Everything else remains same-origin.
+ *   Everything else remains same-origin.
  * - No `upgrade-insecure-requests`: every resource is same-origin, so the
  *   directive protects nothing — and it breaks http-hosted previews on
  *   WebKit (Safari upgrades localhost subresources literally, found by the
@@ -19,14 +23,18 @@ import type { NextConfig } from "next";
  */
 const isDev = process.env.NODE_ENV === "development";
 
+const SPLINE_ORIGIN = "https://*.spline.design";
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
+  // blob: — Spline materializes scene textures as blob: URLs (found by probe)
+  `img-src 'self' data: blob: ${SPLINE_ORIGIN}`,
   "font-src 'self'",
-  "connect-src 'self'",
-  "media-src 'none'",
+  `connect-src 'self' ${SPLINE_ORIGIN}`,
+  `media-src blob: ${SPLINE_ORIGIN}`,
+  "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

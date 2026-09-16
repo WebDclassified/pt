@@ -105,9 +105,6 @@ export default async function ProjectPage({
               <li key={highlight}>{highlight}</li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-secondary-gray">
-            Facts verified against the live repository — not marketing copy.
-          </p>
         </Section>
       ) : (
         <Section title="SYSTEM AT A GLANCE">
@@ -123,43 +120,21 @@ export default async function ProjectPage({
         <p>{project.stack.join(" · ")}</p>
       </Section>
 
-      <Section title="VERIFICATION">
-        {project.verificationNotes ? (
-          <p className="border-l-2 border-signal/60 pl-4 text-warm-white">
-            {project.verificationNotes}
-          </p>
-        ) : (
-          <p>
-            Verification pass pending. Claims shown are limited to what the
-            source data supports today (Phase 11 truth rules).
-          </p>
-        )}
-      </Section>
-
-      <Section title="CREATIVE TREATMENT">
-        <p>
-          Represented through a {project.metaphor.toLowerCase()} — the visual
-          language of this portfolio, applied to what the project actually is.
+      {project.verificationNotes ? (
+        <p className="mt-10 border-l-2 border-signal/60 pl-4 text-xs leading-relaxed text-secondary-gray">
+          {project.verificationNotes}
         </p>
-      </Section>
+      ) : null}
 
-      <Section title="EVIDENCE">
-        <p>
-          The repository above is the primary evidence. Engineering decisions,
-          architecture notes, and results are added to this case study only
-          when they can be verified in the code or a measured source — never
-          as claims.
-        </p>
-      </Section>
-
-      <Section title="CONTACT">
-        <p>
-          Questions about how this was built?{" "}
-          <a href={`mailto:${site.email}`} className="text-signal hover:underline">
-            {site.email}
-          </a>
-        </p>
-      </Section>
+      <p className="mt-10 text-sm text-secondary-gray">
+        Questions about this project?{" "}
+        <a
+          href={`mailto:${site.email}`}
+          className="u-line-link text-signal hover:text-warm-white"
+        >
+          {site.email}
+        </a>
+      </p>
     </article>
   );
 }

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { site } from "../src/content/site";
 
 /**
  * Phase 17 — functional QA matrix (navigation + reflow).
@@ -57,14 +58,15 @@ test.describe("Phase 17 — navigation", () => {
     }
   });
 
-  test("footer credit names the owner and used technologies", async ({
+  test("footer carries status, contact, and sitemap data", async ({
     page,
   }) => {
     await page.goto("/");
     const footer = page.getByRole("contentinfo");
-    await expect(footer).toContainText("A portfolio by Prabhat Teotia");
-    await expect(footer).toContainText("Next.js");
-    await expect(footer).toContainText("Three.js");
+    await expect(footer).toContainText("Open to software engineering roles");
+    await expect(footer).toContainText(site.email);
+    await expect(footer).toContainText("LinkedIn");
+    await expect(footer).toContainText("Recruiter View");
   });
 });
 

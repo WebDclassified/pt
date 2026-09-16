@@ -8,7 +8,6 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { ApertureOverlay } from "@/components/ApertureOverlay";
 import { AudioBridge } from "@/components/AudioBridge";
 import { Wayfinder } from "@/components/Wayfinder";
-import { SkipIntro } from "@/components/SkipIntro";
 import { site } from "@/content/site";
 
 const geistSans = Geist({
@@ -76,7 +75,6 @@ export default function RootLayout({
             <main id="main-content" tabIndex={-1}>{children}</main>
             <SiteFooter />
             <Wayfinder />
-            <SkipIntro />
             <ApertureOverlay />
             <AudioBridge />
           </SmoothScroll>

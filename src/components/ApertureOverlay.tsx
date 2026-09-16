@@ -37,18 +37,29 @@ export function ApertureOverlay() {
     if (!ring || !sheen) return;
 
     const context = gsap.context(() => {
-      gsap.fromTo(
+      // The breath: iris opens, holds a beat, closes — slow enough to read
+      // as a scene change, never a flicker
+      const tl = gsap.timeline();
+      tl.fromTo(
         ring,
         { opacity: 0, scale: 0.86 },
         {
           opacity: 0.9,
           scale: 1,
-          duration: MOTION.duration.scene * 0.45,
+          duration: MOTION.duration.scene * 0.4,
           ease: MOTION.ease.aperture,
-          yoyo: true,
-          repeat: 1,
         },
-      );
+      )
+        .to(ring, {
+          opacity: 0.9,
+          duration: MOTION.duration.scene * 0.2,
+        })
+        .to(ring, {
+          opacity: 0,
+          scale: 1.06,
+          duration: MOTION.duration.scene * 0.4,
+          ease: MOTION.ease.aperture,
+        });
       gsap.fromTo(
         sheen,
         { rotation: 0 },
@@ -73,7 +84,7 @@ export function ApertureOverlay() {
         className="relative h-[min(72vmin,640px)] w-[min(72vmin,640px)] rounded-full opacity-0"
         style={{
           background:
-            "radial-gradient(circle, transparent 62%, rgba(200,255,61,0.07) 72%, rgba(200,25561,0.16) 82%, transparent 92%)",
+            "radial-gradient(circle, transparent 62%, rgba(200,255,61,0.07) 72%, rgba(200,255,61,0.16) 82%, transparent 92%)",
         }}
       >
         <div

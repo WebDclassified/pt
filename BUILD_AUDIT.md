@@ -385,3 +385,271 @@ stack — both now dominate their frames. `scripts/render-gallery.mjs` renders
 all captures with live-computed stats into a single portable
 `evidence/gallery.html` (images embedded as data URLs). Verification: e2e
 90/0, all 18 captures PASS gates.
+
+### Audio redesign — lofi identity (post-M7 polish)
+
+The Phase 09 engine (single sine drone + triangle shimmer) was replaced with
+a fully procedural **lofi engine**, still zero external assets:
+
+| Layer | Implementation |
+|---|---|
+| Warm pad | 5 detuned triangle voices (±9 cents spread) glide between chord voicings (Fmaj9 home, Fm9 precise, Dm9♭6 tension, Cm11 experimental, Cmaj9 airy) through a pad lowpass |
+| Tape filter | Master lowpass per preset (650–1800 Hz); scroll velocity opens it ~1 octave — "traveling opens the sound" |
+| Vinyl bed | 4s pink-noise loop, band-shaped with a −14 dB high shelf, plus sparse scheduled crackle pops |
+| Soft pulse | Lookahead-scheduled 66 BPM groove — muffled sine-drop kick (110→41 Hz) on 1/7/11, brushed off-beat hats |
+| Sparkle | Sparse pentatonic plucks (2.5–6 s apart) through a 0.42 s feedback delay |
+
+Also fixed: AudioBridge fed **monotonic scroll progress** as "velocity" (only
+ever rises — the groove could never settle). It now polls the runtime's
+damped, clamped velocity. `PROJECT_MEDIUM` moved from `silence` to
+`spacious` — a writing/study scene is the natural lofi home.
+
+Process note (P2): a build run while a zombie server held `.next` open
+produced corrupted artifacts (Times New Roman fallback, frozen scene keys —
+the AUDIT-M6-3 failure mode, new variant). Clean-rebuild discipline
+re-confirmed: kill port 3000/3001 listeners **before** `next build`.
+
+Verification: typecheck/lint clean, clean production build, motion+smoke
+21/21, full e2e 90/0. Gesture contract unchanged: sound OFF by default, no
+AudioContext without opt-in, toggle persisted.
+
+## Post-lofi pass — professional motion + Spline signature (2026-09-16)
+
+**Motion/identity pass** (user-directed): hero name promoted to the film's
+largest type (`type-hero`, ~10.5rem max), no tech-stack sentence in the hero,
+recruiter-grade headline from research; "Six systems" section replaced by
+"Systems built end to end"; project pages reduced to project information
+(VERIFIED CAPABILITIES section retained — M4 content gate); footer rebuilt
+around status/contact/sitemap data ("A portfolio by" line removed).
+Professional motion grammar: Reveal rewritten (blur+rise, expo-out, stagger,
+GSAP ScrollTrigger), Lenis-powered smooth anchor navigation with focus
+management (skip-link contract preserved — focus follows the scroll).
+
+**Spline footer signature**: "PRABHAT TEOTIA" at `type-signature` scale over
+the user-supplied Spline scene (`YAqLRWgLb8cznhE7`). The site's only
+third-party embed, built to the same contracts as everything else:
+- Lazy — viewer script fetched on approach (IntersectionObserver, 240px
+  rootMargin), never on the critical path; LCP untouched.
+- Decorative — animation is aria-hidden; the name is real, selectable text
+  present in the DOM regardless of scene success (WebGL-blocked, offline,
+  script failure → static name on its signal-gradient stays).
+- Reduced motion — scene not loaded at all.
+- CSP — exactly two foreign origins added (cdn.spline.design script host,
+  prod.spline.design scene host in connect-src); security tests re-run green.
+
+Test adjustments: canvas-persistence assertion scoped to `main canvas`
+(Spline owns a second decorative canvas); smoke/qa-matrix copy assertions
+updated to the new hero/footer; one prior-turn defect caught — the anchor
+interceptor initially scrolled without moving focus, fixed before ship.
+
+Verification: typecheck clean, production build, full e2e 93 passed /
+0 failed (4 skipped: 2 webkit Tab-port, 2 mobile-only), security suite
+green with the expanded CSP.
+
+### Spline embed → in-house signature (2026-09-16, DEV-SIG-1)
+
+The Spline footer animation was replaced by an in-house three.js scene
+(`FooterSignature`). Rejection rationale, from analysis of the snippet:
+1. **Watermark**: Spline's free tier hard-codes a "Built with Spline"
+   watermark into the hosted viewer — not removable without a paid plan,
+   and stripping it from the embed violates Spline's terms.
+2. **CSP cost**: the viewer initializes blob: workers/wasm; hosting it
+   required widening script-src/connect-src to foreign origins. On the
+   audited CSP this was blocked — the reported "text but no animation"
+   symptom.
+3. **Contract conflict**: a 2MB third-party runtime on the critical
+   path contradicts the Phase 13 budget and the one-shot disposal audit.
+
+The in-house scene keeps the *idea* of the snippet (dark 3D form glowing
+behind the name) in the site's own language: rotating icosahedral wireframe
+core + inner lattice, three signal pulses riding vertex→center→opposite
+chords, 220-particle drifting halo (seeded, `mulberry32`), signal-green
+horizon gradient. Same contracts as every other environment: seeded
+determinism, full disposal symmetry, pause-on-hidden, `low-power` renderer,
+reduced-motion → no canvas, error → gradient + name remain. The name stays
+real, selectable text in all cases.
+
+**Paint proof**: `scripts/verify-signature.mjs` captures the band and
+analyzes pixels in-browser — mean 0.1230, σ 0.2574, lit 25.81% vs a dead
+band's ≈0.020/0.00 floor → PASS (`evidence/signature-verify.png`).
+
+CSP reverted to same-origin-only; security suite re-verified. Full e2e:
+90 passed / 0 failed (4 skipped, unchanged).
+
+### Spline embed restored by user decision (2026-09-16, supersedes DEV-SIG-1)
+
+The user explicitly chose the Spline scene (`gOuXG-md6pmIaSpQ`) for the
+footer over the in-house signature, accepting the free-tier watermark.
+Engineering made the embed safe rather than silently blocked:
+- **CSP widened correctly, evidence-driven**: first attempt blocked the
+  scene exactly as before ("text but no animation"). The paint probe
+  surfaced the real requirements — Spline materializes scene textures as
+  `blob:` URLs (6 img-src violations) — plus `worker-src 'self' blob:` and
+  `'wasm-unsafe-eval'` for its runtime. Final scope: `https://*.spline.design`
+  across script/img/font/connect/media, `blob:` for img/media/worker,
+  `'wasm-unsafe-eval'` in script-src. Everything else stays same-origin.
+- **Paint proof**: `scripts/verify-signature.mjs` — CSP violations 0,
+  `spline-viewer` mounted + shadow-attached, band pixels mean 0.1725 /
+  σ 0.2420 / lit 38.65% (blocked state measured 0.0433 / 3.05%).
+- **Lazy**: viewer (~2MB) + scene (2.76MB) fetch on scroll approach
+  (600px rootMargin), off the critical path; LCP untouched.
+- **Failure-safe**: the name — the only display-scale text in the footer —
+  is real DOM text in all states; offline/blocked/reduced-motion keep the
+  gradient + name. Reduced motion never loads the scene.
+- Probe refinement: element screenshots never stabilize on a continuously
+  repainting canvas — the probe captures the viewport instead, and its
+  wait predicates return plain booleans (object predicates are always
+  truthy and resolve early — caught during this pass).
+
+Verification: typecheck/lint clean, build, full e2e 90 passed / 0 failed
+(4 skipped, unchanged). The in-house `FooterSignature` was removed; its
+design survives in git history if the Spline dependency is ever dropped.
+
+### Footer refinement round (2026-09-16, user direction)
+
+1. **Self-hosted runtime replaces the CDN viewer.** The npm runtime cannot
+   be bundled (webpack: "Can't resolve ../libs/draco/gltf/draco_wasm_wrapper
+   .js" — chunked build with lazy relative imports). Solution: the
+   standalone build (3.3MB, pinned 2.0.52) is served same-origin from
+   public/spline/ and imported natively (`import(/* webpackIgnore: true *)`).
+   Its eight lazy companions (physics, opentype, boolean, howler, navmesh,
+   hana-ui, gaussian-splat-compression, process) are staged alongside; draco
+   wasm libs self-hosted at public/libs/draco/ from the project's own three
+   dependency. Only the scene host (prod.spline.design) remains foreign in
+   CSP; script-src is back to 'self'.
+2. **Baked-in scene text removed via the runtime API.** Scene objects
+   enumerated after load (22 objects); the text/CTA objects — Title, Button,
+   Description 1/2, and the floating word labels Process/Activation/Design/
+   Strategy — are set visible=false. The visible name is exclusively the
+   DOM text "PRABHAT TEOTIA" in the site's display face (Space Grotesk,
+   .type-signature-full), spanning the band edge to edge. Previously-found
+   root cause also fixed here: status state in the effect dependency array
+   caused load-then-immediate-dispose (status frozen at "loading");
+   restructured to a start-guard ref.
+3. **Skip Intro removed** (user direction); §95 test retired with the
+   component. Nav remains the wayfinding path.
+4. **Audio simplified to a sober rhythm** (user direction): vinyl crackle
+   bus, hiss bed, pad detune beating, and the sparkle/delay layer are
+   deleted. Remaining: clean triangle pad (no detune, one breath LFO) and a
+   steady 64-BPM soft beat (kick on downbeats, quiet hat eighths). Scene
+   presets retained; velocity now only gently opens the tone filter — the
+   beat never pushes. Gesture contract unchanged (OFF by default).
+
+**Paint proof (production build):** CSP violations 0, page errors 0, canvas
+mounted, animation diff 93.9%/700ms (live scene), band mean 0.192 / lit
+46.99% → PASS. Probe gates recalibrated for the slow-breathing scene and
+re-baselined now that the scene's own bright text no longer inflates the
+metric. Full e2e: 88 passed / 0 failed (4 skipped, unchanged; −2 = retired
+Skip Intro test across two projects).
+
+### Signature scale + hover (2026-09-16, user direction)
+
+The name now fills the band's complete height and width: a two-line
+"PRABHAT / TEOTIA" lockup at `min(21vw, 260px)` per line in an 86svh band,
+so the signature reads as the footer's full closing frame. The fill is the
+background's own language — a signal-horizon gradient clipped to the glyphs
+over warm white — and on band hover (or focus-within) the horizon
+intensifies and the glow widens, easing on the shared motion curve.
+Verified programmatically: hover sweep changes 57.7% of band pixels
+(probe screenshot diff, before/after); paint probe now reads band mean
+0.368 / lit 74.29% with the scaled type. `prefers-reduced-motion` disables
+the transition. Full e2e re-run: 88 passed / 0 failed (4 skipped).
+
+### Horizon theme + motion refinement (2026-09-16, user direction)
+
+The footer signature's visual language is propagated site-wide so opening
+and closing bookend the film:
+- **Horizon type fills** (`horizon-fill` / `horizon-fill-dim`): signal-green
+  horizon gradient clipped to glyphs over warm white/gray. Applied to the
+  hero name ("Teotia" in the dim variant) and every section heading.
+  Solid-color fallbacks via `@supports`; `::selection` keeps text readable;
+  contrast gate unaffected (static palette pairs, re-run green).
+- **Horizon hairlines**: section headings open with a fading signal rule
+  (`horizon-line`); card `signal-line` became a horizon gradient;
+  `.u-line-link` underlines now draw as a transparent→color→transparent arc
+  (site-wide, header/footer included).
+- **CTA glow**: primary CTAs (VIEW THE WORK, EMAIL ME) gain the signature's
+  hover halo (`cta-glow`, 42px signal shadow).
+- **Motion refinement** (Reveal): custom two-stage curve — fast attack
+  (cubic-bezier(0.19,1,0.22,1)) over a 1.05s settle, travel reduced 40→26px,
+  blur 6→5. Beats arrive decisively then breathe into place, mirroring the
+  film's camera stops. Hero entrance stagger unchanged (pre-hydration CSS).
+- **Process fix**: the self-hosted vendor runtimes (public/spline,
+  public/libs) were being linted — 156 errors from vendor code. Added
+  `ignores` entries; lint back to the pre-existing 3 warnings / 0 errors.
+
+Verification: tsc clean, lint 0 errors, build, full e2e 88 passed / 0
+failed (4 skipped), contrast 11/11 AA, film analyzer gates PASS.
+
+### Hero copy reverted (2026-09-16, user direction)
+
+The hero heading returns to the original copy — "Everything begins with an
+idea. / Then it becomes a system." — with the statement paragraph beneath
+(name — role — one-line proof). The name leaves the hero: it lives in the
+header wordmark and the footer signature, so the hero aligns with the proof
+of work. Later improvements kept: horizon fills, entrance stagger, CTA
+glow. Footer untouched. Test h1 assertions updated (homepage); the
+/recruiter h1 assertion retains the name (that page is identity-first).
+Full smoke suite re-run: 32 passed.
+
+### Hero scale, LAB staging, cinematic motion (2026-09-16, user direction)
+
+1. **Hero type reduced**: `type-hero` cap 10.5rem → 5.25rem, line-height
+   1.04 — statement scale instead of billboard scale (user: "too big").
+2. **Recruiter/Engineer views retained** after review: both carry real,
+   distinct content (fast-facts resume sheet; build architecture/evidence)
+   and the nav spec's Phase 17 test requires the destinations. Removal
+   would delete genuine audience work — declined with rationale.
+3. **LAB staged for real** (§58/59): new `/lab` route with a live exhibit —
+   **Signal Field**: 18,000 seeded particles, pointer as attractor,
+   spring-relaxation back to base, three.js/WebGL, full disposal contracts,
+   static frame under reduced motion, honest "IN THE WORKBENCH" slots
+   (Horizon Audio, TSL Compute Field — no vaporware). WHAT/HOW/STACK/SOURCE
+   format per spec. Homepage LAB section now links to it (ENTER THE LAB);
+   header nav points at `/lab` directly. Exhibit copy serves from the same
+   horizon theme.
+4. **Motion — one cinematic grammar**: `MOTION` now defines a single ease
+   family (expo.out — fast attack, long settle) used by Reveal and the
+   aperture; scene transition lengthened 0.9s → 1.25s with a three-beat
+   iris (open → hold → close) so scene changes read as a breath, not a
+   flicker; Lenis glide deepened (lerp 0.09) and anchor ease to quintic
+   out. One color grammar throughout: signal-green horizon gradients on
+   type fills, hairlines, underlines, aperture ring, and scene accents.
+
+Verification: tsc clean, lint 0 errors (removed one unused var), build,
+full e2e 88 passed / 0 failed (4 skipped), smoke+qa-matrix 44/44 after the
+nav change, /lab renders live exhibit markers on the production build.
+
+### Cinematic continuity + MP3 music + Pixel Forge (2026-09-16, user direction)
+
+1. **Background music → self-hosted MP3** (public/assets/Loser.mp3): the
+   YouTube IFrame channel is removed (CSP back to spline-only). WebAudio
+   channel: fade in from gain 0.03 → slow eased rise to 0.38 (medium),
+   fade-out scheduled to land exactly on the loop boundary, restart with
+   the same fade cycle forever. Frame-level supervision (RAF); gesture-
+   gated SOUND ON; procedural engine remains the failure fallback. No
+   third-party origins needed.
+2. **Cinematic continuity — root cause found and fixed.** Each scene's
+   authored camera path is shot-local; adjacent paths do not share
+   endpoints, so raw evaluation teleported at every scene boundary and the
+   exponential smoothing turned each teleport into a whoosh — the "breaks
+   between sections". Fix: `evaluateCameraContinuous` blends the tail
+   (last 18%) of each scene into the next scene's mirrored entry pose, so
+   position and velocity match continuously at the cut: one unbroken dolly
+   move across the whole film.
+3. **LAB exhibit 02 · PIXEL FORGE — playable pixel workspace**: cellular
+   pixel world (96×54 typed-array grid) with three tools — CONDUCT (signal
+   paths carry traveling pulses), ERODE (unsupported pixels collapse under
+   gravity), GROW (crystals spread along structure). Seeded spawn, 60fps
+   canvas, pauses offscreen, static frame under reduced motion, site
+   palette only, zero dependencies/assets. Live pulse counter; tool hints.
+   LAB scene copy updated to match the real state.
+4. **Copy surgery** (user direction — no filler, experience-led):
+   - SYSTEMS heading: "Every layer, one owner." — the JWT/DB boilerplate
+     paragraph deleted; skills chips speak for themselves
+   - Hero paragraph: distinctive builder's statement replaces the obvious
+     "I build scalable web applications" line
+   - Scene copy synced (LAB beats/metadata)
+
+Verification: tsc clean, build, full e2e 88 passed / 0 failed (4 skipped),
+smoke+experience 40/40 after copy sync, contrast 11/11 AA.

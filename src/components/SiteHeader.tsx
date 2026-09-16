@@ -9,10 +9,16 @@ const navItems = [
   { href: "/#work", label: "Work" },
   { href: "/#experience", label: "Experience" },
   { href: "/#about", label: "About" },
-  { href: "/#lab", label: "Lab" },
+  { href: "/lab", label: "Lab" },
   { href: "/recruiter", label: "Recruiter View" },
   { href: "/engineer", label: "Engineer View" },
 ];
+
+/** Only route links participate in aria-current — never hash anchors. */
+function isCurrentRoute(href: string, pathname: string): boolean {
+  if (href.startsWith("/#")) return false;
+  return href === pathname;
+}
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,18 +61,16 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={
-                item.href === pathname || (item.href.startsWith("/#") && pathname === "/")
-                  ? "true"
-                  : undefined
+                isCurrentRoute(item.href, pathname) ? "true" : undefined
               }
-              className="font-tech px-2 py-2 hover:text-signal"
+              className="u-line-link u-motion-soft font-tech px-2 py-2 text-secondary-gray hover:text-warm-white"
             >
               {item.label}
             </Link>
           ))}
           <a
             href="/resume"
-            className="font-tech px-2 py-2 hover:text-signal"
+            className="u-line-link u-motion-soft font-tech px-2 py-2 text-secondary-gray hover:text-warm-white"
             // Resume is external (Google Drive per source of truth)
             aria-label="Resume (opens Google Drive)"
           >
@@ -79,7 +83,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setAudioEnabled(!audioEnabled)}
             aria-pressed={audioEnabled}
-            className="font-tech px-2 py-2 hover:text-signal"
+            className="u-motion-soft font-tech px-2 py-2 text-secondary-gray hover:text-warm-white"
           >
             {audioEnabled ? "SOUND ON" : "SOUND OFF"}
           </button>
@@ -87,7 +91,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setReducedMotionOverride(!reducedMotion)}
             aria-pressed={reducedMotionOverride === true}
-            className="font-tech px-2 py-2 hover:text-signal"
+            className="u-motion-soft font-tech px-2 py-2 text-secondary-gray hover:text-warm-white"
           >
             {reducedMotion ? "MOTION OFF" : "MOTION ON"}
           </button>
@@ -97,7 +101,7 @@ export function SiteHeader() {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            className="font-tech px-2 py-2 text-warm-white md:hidden"
+            className="u-motion-soft font-tech px-2 py-2 text-warm-white md:hidden"
           >
             {menuOpen ? "CLOSE" : "MENU"}
           </button>
@@ -116,7 +120,7 @@ export function SiteHeader() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="font-tech text-warm-white hover:text-signal"
+                    className="u-motion-soft font-tech text-warm-white hover:text-signal"
                     onClick={() => setMenuOpen(false)}
                   >
                     {item.label}
